@@ -62,5 +62,49 @@
 
 -- 2. Standartizing Data
 
+SELECT * FROM layoffs2;
+SELECT distinct company FROM layoffs2 ORDER BY 1;
+
+-- we can see multiple rows with spaces at front we will fix that
+UPDATE layoffs2 SET company = TRIM(company);
+
+SELECT distinct Location FROM layoffs2 ORDER BY 1;
+SELECT distinct industry FROM layoffs2 ORDER BY 1;
+
+-- we can see multiple distinct names of crypto in industry lets try to fix that
+SELECT * from layoffs2 WHERE industry LIKE "Crypto%";
+-- only 3 rows are with the name Crypto Currency out of 102 rows which might a same as Crypto so we change the rest to Crypto as well
+UPDATE layoffs2 SET industry = 'Crypto' Where industry LIKE "Crypto%";
+-- now lets check again
+SELECT distinct industry FROM layoffs2 ORDER BY 1;
+-- now this looks good
+
+SELECT DISTINCT country FROM layoffs2 ORDER BY 1;
+
+-- Notice there are 2 United States one with . at the end lets fix that now
+SELECT * from layoffs2 WHERE country LIKE "United States.%";
+-- we can see fours rows with United States.
+UPDATE layoffs2 SET country = 'United States' WHERE country LIKE "United States%";
+SELECT DISTINCT country FROM layoffs2 ORDER BY 1;
+-- Now we are done with country coulmn
+
+SELECT * FROM layoffs2;
+
+-- Lets Fix the data column Its is in STR Format
+
+SELECT `date`
+, STR_TO_DATE(`date`, '%m/%d/%Y') AS `Date` FROM layoffs2;
+-- This looks good lets Update the table
+UPDATE layoffs2 SET `date` = STR_TO_DATE(`date`, '%m/%d/%Y');
+SELECT `date` FROM layoffs2;
+-- Now lets change the datetype
+ALTER TABLE layoffs2 MODIFY COLUMN `date` DATE;
+
+
+-- 3. WORKING WITH NULL AND BLANK VALUES
+
+
+
+
 
 
