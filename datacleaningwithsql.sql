@@ -103,6 +103,78 @@ ALTER TABLE layoffs2 MODIFY COLUMN `date` DATE;
 
 -- 3. WORKING WITH NULL AND BLANK VALUES
 
+SELECT * FROM layoffs2;
+SELECT * FROM layoffs2 WHERE total_laid_off IS NULL;
+SELECT * FROM layoffs2 WHERE percentage_laid_off IS NULL;
+SELECT * FROM layoffs2 WHERE percentage_laid_off IS NULL AND total_laid_off IS NULL;
+
+-- SINCE BOTH percentage laid off and total laid off is null we will drop these rows since we cannout use then and cannot be filled
+-- since we dont have any data that can be used to fill these 2 rows
+
+DELETE FROM layoffs2
+WHERE percentage_laid_off IS NULL AND total_laid_off IS NULL;
+
+SELECT * FROM layoffs2 WHERE percentage_laid_off IS NULL AND total_laid_off IS NULL;
+
+SELECT * FROM layoffs2 WHERE company IS NULL OR company = ''; -- NO NULLS OR BLANKS
+SELECT * FROM layoffs2 WHERE industry IS NULL OR industry =''; -- NULL & BLANK VALUES FOUND
+SELECT * FROM layoffs2 WHERE country IS NULL OR country =''; -- NO NULLS
+
+-- LETS TRY TO FILL THE NULL & BLANKS IN INDUSTRY FIRST
+SELECT * FROM layoffs2 WHERE industry IS NULL OR industry ='';
+-- WE WILL TRY TO FIND ANY OTHER ROWS WITH SAME COMPANY AND LOCATION NAMES AS THE ONES WE FOUND AND TRY TO FILL THEM WITH SIMILAR DATA
+SELECT * FROM layoffs2 WHERE company = 'Airbnb' AND location = 'SF Bay Area'; -- FOUND SIMILAR ROW
+-- INSTEAD OF THE ABOVE APPROCH WE WILL USE SELF JOINS
+SELECT * FROM layoffs2 t1
+JOIN layoffs2 t2 ON
+t1.company = t2.company AND t1.location = t2.location
+WHERE t1.industry IS NULL AND t2.industry IS NOT NULL;
+-- THERE WAS NO OUTPUT SINCE WE ALSO HAD BLANKS LETS CONVERT THE BLANKS INTO NULLS FOR EASIER PROGRESS
+UPDATE layoffs2 SET industry = NULL WHERE industry = '';
+-- NOW LETS TRY AGAIN
+SELECT * 
+FROM layoffs2 t1
+JOIN layoffs2 t2 
+	ON t1.company = t2.company AND t1.location = t2.location
+	WHERE t1.industry IS NULL AND t2.industry IS NOT NULL;
+-- NOW THIS RUNS WE GOT 3 RESULTS
+-- LETS FILL THE NULLS
+SELECT t1.industry, t2.industry 
+FROM layoffs2 t1
+JOIN layoffs2 t2 
+	ON t1.company = t2.company AND t1.location = t2.location
+	WHERE t1.industry IS NULL AND t2.industry IS NOT NULL;
+
+UPDATE layoffs2 t1
+JOIN layoffs2 t2 
+	ON t1.company = t2.company AND t1.location = t2.location
+    SET t1.industry = t2.industry
+	WHERE t1.industry IS NULL AND t2.industry IS NOT NULL;
+
+-- LETS RECHECK
+SELECT t1.industry, t2.industry 
+FROM layoffs2 t1
+JOIN layoffs2 t2 
+	ON t1.company = t2.company AND t1.location = t2.location
+	WHERE t1.industry IS NULL AND t2.industry IS NOT NULL;
+
+-- NO NULLS 
+-- NOW WE ARE DONE WITH WORKING WITH NULLS
+
+-- NOW LETS REMOVE ANY EXTRA COLUMNS OR ROWS WE DONT NEED
+
+SELECT * FROM layoffs2;
+
+ALTER table layoffs2 DROP COLUMN row_num;
+
+SELECT * FROM layoffs2;
+
+-- THIS IS OUR CLEANED DATA
+
+
+-- FROM HERE WE WILL CONTINUE WITH EDA(EXPLORATORY DATA ANALYSIS)
+
+
 
 
 
